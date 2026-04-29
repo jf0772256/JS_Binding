@@ -367,8 +367,10 @@ class App
 			}
 		});
 		// remove non-static event listeners
+		this.#method.clearRegisteredEvents(true);
 		this.#bind.apply();
 		// when rebinding only reapply event listeners to non-static event objects
+		this.#method.startRegistration(true);
 	}
 	
 	get methods()
