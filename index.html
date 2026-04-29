@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Observer Test</title>
+	<script src="js/bindable.js"></script>
+	<style>
+		[role=template]{
+			display:none;
+		}
+	</style>
+</head>
+<body>
+
+<label for="observable-input" style="display:block;">My name is:: <span jf-bind="person.name"></span> My age is:: <span jf-bind="person.age"></span></label>
+<input type="text" name="observable-input" id="observable-input" jf-model="person.name"> <input type="text" name="observable-input2" id="observable-input2" jf-model="person.age">
+
+<br>
+<br>
+<h1>For loop</h1>
+<table>
+	<thead>
+		<tr>
+			<th>Task Id</th>
+			<th>Task Name</th>
+			<th>Task Completed</th>
+			<th>Task Added By</th>
+		</tr>
+	</thead>
+	<tbody jf-for="tasks as task">
+		<tr role="template">
+			<td jf-bind="id"></td>
+			<td jf-bind="name"></td>
+			<td jf-bind="completed"></td>
+			<td jf-bind="addedby.name"></td>
+		</tr>
+	</tbody>
+</table>
+
+<br>
+<br>
+<h1>For loop test 2</h1>
+<span><button jf-click="createTodo">Add ToDo</button></span>
+<ul style="list-style: none" jf-for="todos as todo">
+
+	<li role="template">
+		<span jf-bind=""></span>
+		<button jf-click="deleteTodo" jf-props="this.parentElement.querySelector('span').innerHTML">&times;</button>
+	</li>
+</ul>
+
+<br>
+<br>
+<h1>For loop test 3</h1>
+<span><button jf-click="createTodo1">Add ToDo</button></span>
+<ul style="list-style: none" jf-for="todos1 as todo" jf-template="<li><span jf-bind=''></span><button jf-click='deleteTodo1' jf-props='this.parentElement.querySelector(&quot;span&quot;).innerHTML'>&times;</button></li>"></ul>
+
+<script>
+
+	let app = {
+		data: {
+			person: {
+				name: 'Jesse',
+				age: 38
+			},
+			tasks : [
+				{
+					id: 1,
+					name: "Do something",
+					completed: false,
+					addedby: {
+						name: 'Jesse Fender'
+					}
+				},
+				{
+					id: 2,
+					name: "Do something else",
+					completed: false,
+					addedby: {
+						name: 'Jesse Fender'
+					}
+				},
+				{
+					id: 3,
+					name: "Do another something",
+					completed: false,
+					addedby: {
+						name: 'Jesse Fender'
+					}
+				},
+			],
+			todos: [
+				"task 1",
+				"task 2",
+				"task 3",
+				"task 4"
+			],
+			todos1: []
+		},
+		methods: {
+			click: {
+				deleteTodo: function(event, taskName) {
+					if(confirm('Are you sure you want to delete todo ('+event.detail.taskName+')?'))
+					{
+						app.data.todos = app.data.todos.filter(todo => todo != event.detail.taskName)
+						event.detail.event.target.parentElement.remove();
+					}
+				},
+				createTodo: function (event){
+					let taskName = prompt("Enter the task name: ");
+					app.data.todos.push(taskName);
+					myApp.rebind();
+				},
+				deleteTodo1: function(event, taskName) {
+					if(confirm('Are you sure you want to delete todo ('+event.detail.taskName+')?'))
+					{
+						app.data.todos1 = app.data.todos1.filter(todo => todo != event.detail.taskName)
+						event.detail.event.target.parentElement.remove();
+					}
+				},
+				createTodo1: function (event){
+					let taskName = prompt("Enter the task name: ");
+					app.data.todos1.push(taskName);
+					console.log(app.data.todos1);
+					myApp.rebind();
+					console.log(app.data.todos1, myApp.data());
+				}
+			}
+		},
+		defaultHandlers: {
+			for: null,
+			bind: null,
+			model: null
+		}
+	}
+
+	let myApp = new App(app);
+</script>
+
+</body>
+</html>
