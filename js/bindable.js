@@ -149,7 +149,9 @@ class Binding
 		// possibly remove template? only issue with that would be if we want to allow for expandability...
 	};
 	
-	constructor(data = {}, handler = {for: null, bind: null, model: null})
+	defaultIfBehavior = (event) => {}
+	
+	constructor(data = {}, handler = {for: null, bind: null, model: null, if: null})
 	{
 		this.#boundData = data;
 		// set default handlers if defined
@@ -164,6 +166,10 @@ class Binding
 		if (handler.model instanceof Function)
 		{
 			this.defaultModelBehavior = handler.model;
+		}
+		if (handler.if instanceof Function)
+		{
+			this.defaultIfBehavior = handler.if;
 		}
 	}
 	apply()
@@ -347,7 +353,7 @@ class App
 	 * Initiate the bindable content, (bind, model) and eventually if and for...
 	 * @param appObj Object, must have data object or will fail. eg: {..., data: {...}, methods: {}, ...}
 	 */
-	constructor(appObj = {data:{}, methods: {}, defaultHandlers: { for: null, bind: null, model: null }})
+	constructor(appObj = {data:{}, methods: {}, defaultHandlers: { for: null, bind: null, model: null, if:null }})
 	{
 		this.#bind = new Binding(appObj.data, appObj.defaultHandlers);
 		this.#bind.apply();
