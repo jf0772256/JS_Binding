@@ -363,7 +363,7 @@ class App
 			}
 			else
 			{
-				ch.children.forEach(e=>e.remove());
+				ch.innerHTML = ''; // OMG that was so annoying!
 			}
 		});
 		// remove non-static event listeners
