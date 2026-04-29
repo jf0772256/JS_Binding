@@ -248,12 +248,35 @@ class Methods extends EventTarget
 		super();
 		this.#methodData = methodObj;
 		// get action names like click, input, change...
+		this.startRegistration();
+	}
+	
+	startRegistration()
+	{
 		for (let methodAction of Object.keys(this.#methodData))
 		{
 			// now we have the methods that will be used... we need to iterate over the method keys or method name and triggers
 			for (let methodName of Object.keys(this.#methodData[methodAction]))
 			{
 				this.registerEvent(methodAction, methodName, this.#methodData[methodAction][methodName]);
+				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]').forEach(element => {
+					element.addEventListener(methodAction, e => {
+						let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
+						this.triggerEvent(methodAction, methodName, e, props);
+					});
+				});
+			}
+		}
+	}
+	
+	clearRegisteredEvents()
+	{
+		for (let methodAction of Object.keys(this.#methodData))
+		{
+			// now we have the methods that will be used... we need to iterate over the method keys or method name and triggers
+			for (let methodName of Object.keys(this.#methodData[methodAction]))
+			{
+				this.unregisterEvent(methodAction, methodName, this.#methodData[methodAction][methodName]);
 				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]').forEach(element => {
 					element.addEventListener(methodAction, e => {
 						let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
@@ -279,6 +302,10 @@ class Methods extends EventTarget
 	}
 	
 	get methods()
+	{
+		return this.#events;
+	}
+	get events()
 	{
 		return this.#events;
 	}
