@@ -47,7 +47,7 @@
 <br>
 <br>
 <h1>For loop test 2</h1>
-<span><button jf-click="createTodo">Add ToDo</button></span>
+<span><button jf-click="createTodo" jf-event="static">Add ToDo</button></span>
 <ul style="list-style: none" jf-for="todos as todo">
 
 	<li role="template">
@@ -59,7 +59,7 @@
 <br>
 <br>
 <h1>For loop test 3</h1>
-<span><button jf-click="createTodo1">Add ToDo</button></span>
+<span><button jf-click="createTodo1" jf-event="static">Add ToDo</button></span>
 <ul style="list-style: none" jf-for="todos1 as todo" jf-template="<li><span jf-bind=''></span><button jf-click='deleteTodo1' jf-props='this.parentElement.querySelector(&quot;span&quot;).innerHTML'>&times;</button></li>"></ul>
 
 <script>
