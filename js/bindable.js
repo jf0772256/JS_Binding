@@ -234,12 +234,19 @@ class Methods extends EventTarget
 									.replace('(','')
 									.replace(' ','')
 									.split(',')
+									.map(str=>str.trim())
 									.filter((item,index)=> index !== 0);
 		argNames.forEach(item=> compiledProp[item] = null);
 		for (let index = 0; index < props.length; index++)
 		{
 			let propStr = props[index].replace('this', 'triggered.target');
-			compiledProp[argNames[index]] = eval(propStr);
+			try {
+				compiledProp[argNames[index]] = eval(propStr);
+			}
+			catch (e)
+			{
+				compiledProp[argNames[index]] = propStr;
+			}
 		}
 		return compiledProp;
 	}
