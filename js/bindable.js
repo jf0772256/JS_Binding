@@ -258,13 +258,23 @@ class Methods extends EventTarget
 		this.startRegistration();
 	}
 	
-	startRegistration()
+	startRegistration(reBind = false)
 	{
 		for (let methodAction of Object.keys(this.#methodData))
 		{
 			// now we have the methods that will be used... we need to iterate over the method keys or method name and triggers
 			for (let methodName of Object.keys(this.#methodData[methodAction]))
 			{
+				if (reBind)
+				{
+					document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]:not([jf-event="static"])').forEach(element => {
+						element.addEventListener(methodAction, e => {
+							let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
+							this.triggerEvent(methodAction, methodName, e, props);
+						});
+					});
+					continue;
+				}
 				this.registerEvent(methodAction, methodName, this.#methodData[methodAction][methodName]);
 				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]').forEach(element => {
 					element.addEventListener(methodAction, e => {
@@ -276,15 +286,25 @@ class Methods extends EventTarget
 		}
 	}
 	
-	clearRegisteredEvents()
+	clearRegisteredEvents(reBind = false)
 	{
 		for (let methodAction of Object.keys(this.#methodData))
 		{
 			// now we have the methods that will be used... we need to iterate over the method keys or method name and triggers
 			for (let methodName of Object.keys(this.#methodData[methodAction]))
 			{
+				if (reBind)
+				{
+					document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]:not([jf-event="static"])').forEach(element => {
+						element.addEventListener(methodAction, e => {
+							let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
+							this.triggerEvent(methodAction, methodName, e, props);
+						});
+					});
+					continue;
+				}
 				this.unregisterEvent(methodAction, methodName, this.#methodData[methodAction][methodName]);
-				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]:not([jf-event="static"])').forEach(element => {
+				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]').forEach(element => {
 					element.addEventListener(methodAction, e => {
 						let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
 						this.triggerEvent(methodAction, methodName, e, props);
@@ -346,7 +366,9 @@ class App
 				ch.children.forEach(e=>e.remove());
 			}
 		});
+		// remove non-static event listeners
 		this.#bind.apply();
+		// when rebinding only reapply event listeners to non-static event objects
 	}
 	
 	get methods()
