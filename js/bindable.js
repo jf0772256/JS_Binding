@@ -277,7 +277,7 @@ class Methods extends EventTarget
 			for (let methodName of Object.keys(this.#methodData[methodAction]))
 			{
 				this.unregisterEvent(methodAction, methodName, this.#methodData[methodAction][methodName]);
-				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]').forEach(element => {
+				document.querySelectorAll('[jf-'+methodAction+'="'+methodName+'"]:not([jf-event="static"])').forEach(element => {
 					element.addEventListener(methodAction, e => {
 						let props = e.target.hasAttribute('jf-props') ? e.target.getAttribute('jf-props').split(',').map(item => item.trim()) : undefined;
 						this.triggerEvent(methodAction, methodName, e, props);

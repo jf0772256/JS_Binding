@@ -19,6 +19,9 @@
 
 <br>
 <br>
+<h1 jf-click="showAlert" jf-props="'Hello from static click event'" jf-event="static">static event test</h1>
+<br>
+<br>
 <h1>For loop</h1>
 <table>
 	<thead>
@@ -126,6 +129,10 @@
 					console.log(app.data.todos1);
 					myApp.rebind();
 					console.log(app.data.todos1, myApp.data);
+				},
+				// static method test for methods that don't need to be reset each rebind
+				showAlert: function (event, message) {
+					alert(event.detail.message);
 				}
 			}
 		},
