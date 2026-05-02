@@ -49,7 +49,8 @@ class Binding
 	#observables = {
 		bind: {},
 		model: {},
-		for: {}
+		for: {},
+		if: {}
 	};
 	
 	/**
@@ -206,6 +207,31 @@ class Binding
 			observer.subscribe('load', this.defaultForBehavior);
 			observer.notify('load', {prop: data[0], varName: data[1]});
 		}, this);
+		
+		document.querySelectorAll("[jf-if]").forEach(element =>
+		{
+			const actions = {};
+			// deal with if statement
+			let data = element.getAttribute('jf-if');
+			let objVal = this.#resolvePath(data.split(' ')[0], this.#boundData);
+			let observer = new Observable(objVal);
+			observer.subscribe('load', this.defaultIfBehavior);
+			observer.subscribe('change', this.defaultIfBehavior);
+			observer.notify('load', {value: objVal, target: element, conditional: data});
+			this.#observables.model[data.split(' ')[0]] = observer;
+			//
+			// want to get the 'if' logic basics down before I complicate
+			///
+			// // check if && or || are present
+			// if (data.indexOf("&&") !== -1)
+			// {
+			//  	// split ands
+			// }
+			// if (data.indexOf("||") !== -1)
+			// {
+			// 	// split or
+			// }
+		});
 	}
 	update(what, fireEvent = false, event = 'notify', updateValue = false, newValue = null)
 	{
@@ -215,6 +241,18 @@ class Binding
 		{}
 		if(Object.keys(this.#observables.for).includes(what))
 		{}
+		if(Object.keys(this.#observables.if).includes(what))
+		{
+			const observable = this.#observables.if[what];
+			if (updateValue) observable.value = newValue;
+			if (fireEvent)
+			{
+				let ele = document.querySelectorAll('[jf-if="'+what+'*"]')
+				let cond = ele.getAttribute('[jf-if]');
+				let objVal = this.#resolvePath(what, this.#boundData);
+				observable.notify(event, {value: objVal, target: ele, cond: cond});
+			}
+		}
 	}
 	get data()
 	{
@@ -377,6 +415,19 @@ class App
 		this.#bind.apply();
 		// when rebinding only reapply event listeners to non-static event objects
 		this.#method.startRegistration(true);
+	}
+	
+	/**
+	 * Giving access to request updates... Currently, works only with single condition ifs observables.
+	 * @param what dataObject (should be the left most condition. eg. app.data.showMe = false; &lt;p jf-if="showMe == true"&gt;...text or html...&lt;/p&gt;
+	 * @param {boolean=false} fireEvent fire an event
+	 * @param {string='notify'} event event string eg. 'load', 'input' & 'change' ... etc.
+	 * @param {boolean=false} updateValue update observable value use caution here!
+	 * @param {*=null} newValue value to update.
+	 */
+	update(what, fireEvent = false, event = 'notify', updateValue = false, newValue = null)
+	{
+		this.#bind.update(what, fireEvent, event, updateValue, newValue);
 	}
 	
 	get methods()

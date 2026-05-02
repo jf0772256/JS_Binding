@@ -24,6 +24,10 @@
 <h1 jf-click="showAlert" jf-props="'Hello from non-static click event'">non-static event test (same method)</h1>
 <br>
 <br>
+<span>test of if</span>
+<p jf-if="showMe == false">This should not be shown if it is working</p>
+<br>
+<br>
 <h1>For loop</h1>
 <table>
 	<thead>
@@ -102,7 +106,8 @@
 				"task 3",
 				"task 4"
 			],
-			todos1: []
+			todos1: [],
+			showMe: true
 		},
 		methods: {
 			click: {
@@ -142,7 +147,62 @@
 			for: null,
 			bind: null,
 			model: null,
-			if: null
+			"if": function(event) {
+				/**
+				 * runs the checks for each conditional
+				 * @param {string} condition condition string, should be dataProp operator controlValue eg: 'show == 1'
+				 * @param {any} value value for data prop
+				 * @returns {boolean}
+				 */
+				const checkCond = (condition, value) => {
+					let broken = condition.split(' ');
+					let [prop, check, control] = broken;
+					// convert bool values to bool from string
+					if (control === 'true') control = true;
+					if (control === 'false') control = false;
+					switch (check)
+					{
+						case '==':
+							return value == control;
+							break;
+						case '!=':
+							return value != control;
+							break;
+						case '>':
+							return value > control;
+							break;
+						case '<':
+							return value < control;
+							break;
+						case '>=':
+							return value >= control;
+							break;
+						case '<=':
+							return value <= control;
+							break;
+						default:
+							throw new Error(`That operator(${check}) is not supported`);
+					}
+				};
+				// console.log(checkCond(event.detail.conditional, event.detail.value));
+				let checked = checkCond(event.detail.conditional, event.detail.value);
+
+				let target = event.detail.target;
+				if (checked)
+				{
+					// show value
+					let attValue = target.getAttribute('jf-data-value');
+					target.innerHTML = attValue;
+					target.removeAttribute('jf-data-value');
+				}
+				else
+				{
+					// remove value
+					target.setAttribute('jf-data-value', target.innerHTML);
+					target.innerHTML= '';
+				}
+				debugger;
+			}
 		}
 	}
 
