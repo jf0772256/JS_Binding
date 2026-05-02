@@ -7,7 +7,7 @@
 	<title>Observer Test</title>
 	<script src="js/bindable.js"></script>
 	<style>
-		[role=template]{
+		[role=template], .d-none{
 			display:none;
 		}
 	</style>
@@ -194,12 +194,14 @@
 					let attValue = target.getAttribute('jf-data-value');
 					target.innerHTML = attValue;
 					target.removeAttribute('jf-data-value');
+					target.classList.remove('d-none');
 				}
 				else
 				{
 					// remove value
 					target.setAttribute('jf-data-value', target.innerHTML);
 					target.innerHTML= '';
+					target.classList.add('d-none');
 				}
 				debugger;
 			}

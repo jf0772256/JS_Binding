@@ -218,7 +218,7 @@ class Binding
 			observer.subscribe('load', this.defaultIfBehavior);
 			observer.subscribe('change', this.defaultIfBehavior);
 			observer.notify('load', {value: objVal, target: element, conditional: data});
-			this.#observables.model[data.split(' ')[0]] = observer;
+			this.#observables.if[data.split(' ')[0]] = observer;
 			//
 			// want to get the 'if' logic basics down before I complicate
 			///
@@ -247,7 +247,8 @@ class Binding
 			if (updateValue) observable.value = newValue;
 			if (fireEvent)
 			{
-				let ele = document.querySelectorAll('[jf-if="'+what+'*"]')
+				// for now we will only look at the first... this will be expanded on.
+				let ele = document.querySelectorAll('[jf-if^="'+what+'"]')[0];
 				let cond = ele.getAttribute('[jf-if]');
 				let objVal = this.#resolvePath(what, this.#boundData);
 				observable.notify(event, {value: objVal, target: ele, cond: cond});
