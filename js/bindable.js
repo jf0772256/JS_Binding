@@ -319,6 +319,11 @@ class Binding
 	{
 		return this.#observables;
 	}
+	
+	resolve(path)
+	{
+		return this.#resolvePath(path, this.#boundData);
+	}
 }
 
 class Methods extends EventTarget
@@ -485,6 +490,11 @@ class App
 	update(what, fireEvent = false, event = 'notify', updateValue = false, newValue = null)
 	{
 		this.#bind.update(what, fireEvent, event, updateValue, newValue);
+	}
+	
+	resolve(path)
+	{
+		return this.#bind.resolve(path);
 	}
 	
 	get methods()

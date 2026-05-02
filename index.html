@@ -23,6 +23,9 @@
 <br>
 <h1 jf-click="showAlert" jf-props="'Hello from non-static click event'">non-static event test (same method)</h1>
 <br>
+<h1 jf-click="greet" jf-props="person.name,person.age" jf-event="static">Greetings! (click to show it works).</h1>
+<br>
+<br>
 <br>
 <div>
 	<button jf-click="toggleTestIf" jf-event="static">Toggle If Content</button>
@@ -143,6 +146,11 @@
 				// static method test for methods that don't need to be reset each rebind
 				showAlert: function (event, message) {
 					alert(event.detail.message);
+				},
+				greet: (event, name, age) => {
+					let resolvedName = myApp.resolve(event.detail.name);
+					let resolvedAge = myApp.resolve(event.detail.age);
+					alert(`Hello ${resolvedName}! You are ${resolvedAge} years old!`);
 				},
 				toggleTestIf: function (event) {
 					app.data.showMe = !app.data.showMe;
