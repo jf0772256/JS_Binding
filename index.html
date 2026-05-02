@@ -34,6 +34,7 @@
 <p jf-if="showMe == false">This should not be shown if it is working</p>
 <br>
 <br>
+
 <h1>For loop</h1>
 <table>
 	<thead>
@@ -51,6 +52,36 @@
 			<td jf-bind="completed"></td>
 			<td jf-bind="addedby.name"></td>
 		</tr>
+	</tbody>
+</table>
+
+<br>
+<br>
+<h1>For loop nested for loops</h1>
+<table>
+	<thead>
+	<tr>
+		<th>Book Id</th>
+		<th>Book Name</th>
+		<th>Book Published</th>
+		<th>People Involved</th>
+	</tr>
+	</thead>
+	<tbody jf-for="testQbjNestArray as book">
+	<tr role="template">
+		<td jf-bind="id"></td>
+		<td jf-bind="name"></td>
+		<td jf-bind="published"></td>
+		<td>
+			<ul style="list-style: none" jf-for="book.people as person">
+				<li role="template">
+					<span>name: <span jf-bind="name"></span>&nbsp;&nbsp;</span>
+					<span>age: <span jf-bind="age"></span>&nbsp;&nbsp;</span>
+					<span>title: <span jf-bind="role"></span></span>
+				</li>
+			</ul>
+		</td>
+	</tr>
 	</tbody>
 </table>
 
@@ -113,7 +144,53 @@
 				"task 4"
 			],
 			todos1: [],
-			showMe: true
+			showMe: true,
+			testQbjNestArray: [
+				{
+					id:1,
+					name:'Test Object 1',
+					published: "7/18/2000",
+					people: [
+						{
+							name: 'John Doe',
+							age: 25,
+							role: 'Author'
+						},
+						{
+							name: 'Anne Doe',
+							age: 35,
+							role: 'Editor'
+						},
+						{
+							name: 'Harry Smith',
+							age: 55,
+							role: 'Book Agent'
+						}
+					]
+				},
+				{
+					id:2,
+					name:'Test Object 2',
+					published: "5/30/2025",
+					people: [
+						{
+							name: 'John Doe',
+							age: 50,
+							role: 'Author'
+						},
+						{
+							name: 'Anne Doe',
+							age: 60,
+							role: 'Editor'
+						},
+						{
+							name: 'Harry Smith II',
+							age: 45,
+							role: 'Book Agent'
+						}
+					]
+				}
+			]
 		},
 		methods: {
 			click: {

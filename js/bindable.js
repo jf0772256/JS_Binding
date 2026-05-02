@@ -100,8 +100,10 @@ class Binding
 	
 	defaultForBehavior = (event) => {
 		let loopable = this.#resolvePath(event.detail.prop, this.#boundData);
+		if (!loopable) return; // this is a nested for loop we dealt with this within the parent loopable - nothing will happen here and so we exit gracefully
 		let target = document.querySelector('[jf-for="'+event.detail.prop+' as '+event.detail.varName+'"]');
 		let template = target.querySelector('[role="template"]');
+		let nested = template.querySelectorAll('[jf-for]')[0] ?? null;
 		for (this[event.detail.varName] of loopable)
 		{
 			let newElem;
@@ -144,11 +146,84 @@ class Binding
 					}
 				});
 			}
+			// try to force the inner for loop to be compiled... this is dirty but otherwise nested for loops will not work.
+			if (nested instanceof Element)
+			{
+				let nestedDetails = nested.getAttribute('jf-for').split(' as ');
+				let nestedLoopable = this.#resolvePath(nestedDetails[0], this);
+				let nestedEle = newElem.querySelector('[jf-for]');
+				this.defaultNestedForBehavior(target, nestedEle, nestedDetails[0], nestedDetails[1], nestedLoopable);
+			}
 			// push to document via target
 			target.append(newElem);
 		}
-		// possibly remove template? only issue with that would be if we want to allow for expandability...
 	};
+	
+	/**
+	 * Traverse nodes to find the matching one with a tagName - this is only used when doing nested loops.
+	 * @param {HTMLElement} nodeToStartFrom the parent of the nested loop. (up one level form the element with the jf-for)
+	 * @param {string} tagNameToFind string tag element name to try to find.
+	 * @returns {HTMLElement|boolean} if found will return the found element - if not then there was a very bad thing happening
+	 */
+	findNearestParent(nodeToStartFrom, tagNameToFind)
+	{
+		const dieIf = 'BODY';
+		let current = nodeToStartFrom;
+		while (current.tagName !== dieIf)
+		{
+			current = current.parentElement;
+			if (current.tagName === tagNameToFind) return current;
+		}
+		return false;
+	}
+	
+	/**
+	 * looks to see if an element has any children that are bindable, will return false if no bindable attribute is found, the found HTMLElement if 1 is located with jf-bind attribute, and will return the number of bindable children found if there is more than 1... which shouldn't normally be a thing, but it is possible so we will have to deal with that when the time comes.
+	 * @param {HTMLElement} elementToCheck Element to check the children nodes for bindablility.
+	 * @returns {HTMLElement|number|boolean}
+	 */
+	findNearestBindableElement(elementToCheck)
+	{
+		const len = elementToCheck.querySelectorAll('[jf-bind]').length;
+		if (len === 0) return false;
+		if (len > 1) return len;
+		return elementToCheck.querySelectorAll('[jf-bind]')[0];
+	}
+	
+	defaultNestedForBehavior = (fatherParentElement, nestedTarget, prop, varName, loopable) => {
+		let template = nestedTarget.querySelector('[role="template"]');
+		for (let loopableElement of loopable) {
+			//return console.log(loopableElement);
+			let newElem;
+			// clone template.
+			newElem = template.cloneNode(true);
+			// remove template role from cloned
+			newElem.removeAttribute('role');
+			if (newElem.hasAttribute('jf-bind') && newElem.getAttribute('jf-bind') === "")
+			{
+				['input','select'].includes(newElem.tagName.toLowerCase())  ? newElem.value = loopableElement[varName] : newElem.tagName.toLowerCase() === 'textarea' ? newElem.textContent = loopableElement[varName] : newElem.innerHTML = loopableElement[varName];
+			}
+			else if (newElem.childElementCount !== 0)
+			{
+				newElem.children.forEach(ele =>
+				{
+					if (ele.hasAttribute('jf-bind'))
+					{
+						let value = ele.getAttribute('jf-bind').length > 0 ? this.#resolvePath(ele.getAttribute('jf-bind'), loopableElement[varName]) : loopableElement[varName];
+						['input','select'].includes(ele.tagName.toLowerCase())  ? ele.value = value : ele.tagName.toLowerCase() === 'textarea' ? ele.textContent = value : ele.innerHTML = value;
+					}
+					else if (this.findNearestBindableElement(ele) !== false)
+					{
+						let eleFound = this.findNearestBindableElement(ele);
+						let value = eleFound.getAttribute('jf-bind').length > 0 ? this.#resolvePath(eleFound.getAttribute('jf-bind'), loopableElement) : loopableElement[varName];
+						['input','select'].includes(eleFound.tagName.toLowerCase())  ? eleFound.value = value : eleFound.tagName.toLowerCase() === 'textarea' ? eleFound.textContent = value : eleFound.innerHTML = value;
+					}
+				});
+			}
+			nestedTarget.append(newElem);
+		}
+		fatherParentElement.setAttribute('processedNestedLoop', true);
+	}
 	
 	defaultIfBehavior =  (event) => {
 		/**
