@@ -251,7 +251,7 @@ class Binding
 				let ele = document.querySelectorAll('[jf-if^="'+what+'"]')[0];
 				let cond = ele.getAttribute('jf-if');
 				let objVal = this.#resolvePath(what, this.#boundData);
-				observable.notify(event, {value: objVal, target: ele, cond: cond});
+				observable.notify(event, {value: objVal, target: ele, conditional: cond});
 			}
 		}
 	}
