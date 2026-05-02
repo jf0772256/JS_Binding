@@ -24,6 +24,9 @@
 <h1 jf-click="showAlert" jf-props="'Hello from non-static click event'">non-static event test (same method)</h1>
 <br>
 <br>
+<div>
+	<button jf-click="toggleTestIf" jf-event="static">Toggle If Content</button>
+</div>
 <span>test of if</span>
 <p jf-if="showMe == false">This should not be shown if it is working</p>
 <br>
@@ -140,6 +143,10 @@
 				// static method test for methods that don't need to be reset each rebind
 				showAlert: function (event, message) {
 					alert(event.detail.message);
+				},
+				toggleTestIf: function (event) {
+					app.data.showMe = !app.data.showMe;
+					myApp.update('showMe', true, 'change');
 				}
 			}
 		},
