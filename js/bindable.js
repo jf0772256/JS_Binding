@@ -150,7 +150,63 @@ class Binding
 		// possibly remove template? only issue with that would be if we want to allow for expandability...
 	};
 	
-	defaultIfBehavior = (event) => {}
+	defaultIfBehavior =  (event) => {
+		/**
+		 * runs the checks for each conditional
+		 * @param {string} condition condition string, should be dataProp operator controlValue eg: 'show == 1'
+		 * @param {any} value value for data prop
+		 * @returns {boolean}
+		 */
+		const checkCond = (condition, value) => {
+			let broken = condition.split(' ');
+			let [prop, check, control] = broken;
+			// convert bool values to bool from string
+			if (control === 'true') control = true;
+			if (control === 'false') control = false;
+			switch (check)
+			{
+				case '==':
+					return value == control;
+					break;
+				case '!=':
+					return value != control;
+					break;
+				case '>':
+					return value > control;
+					break;
+				case '<':
+					return value < control;
+					break;
+				case '>=':
+					return value >= control;
+					break;
+				case '<=':
+					return value <= control;
+					break;
+				default:
+					throw new Error(`That operator(${check}) is not supported`);
+			}
+		};
+		// console.log(checkCond(event.detail.conditional, event.detail.value));
+		let checked = checkCond(event.detail.conditional, event.detail.value);
+		
+		let target = event.detail.target;
+		if (checked)
+		{
+			// show value
+			let attValue = target.getAttribute('jf-data-value');
+			target.innerHTML = attValue;
+			target.removeAttribute('jf-data-value');
+			target.classList.remove('d-none');
+		}
+		else
+		{
+			// remove value
+			target.setAttribute('jf-data-value', target.innerHTML);
+			target.innerHTML= '';
+			target.classList.add('d-none');
+		}
+	}
 	
 	constructor(data = {}, handler = {for: null, bind: null, model: null, if: null})
 	{
