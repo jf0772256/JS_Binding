@@ -103,7 +103,7 @@ class Binding
 		if (!loopable) return; // this is a nested for loop we dealt with this within the parent loopable - nothing will happen here and so we exit gracefully
 		let target = document.querySelector('[jf-for="'+event.detail.prop+' as '+event.detail.varName+'"]');
 		let template = target.querySelector('[role="template"]');
-		let nested = template.querySelectorAll('[jf-for]')[0] ?? null;
+		let nested = (!!template) ? template.querySelectorAll('[jf-for]')[0] : null;  // if using the jf-template attribute string this was causing errors - don't use the jf-attribute for nested for loops
 		for (this[event.detail.varName] of loopable)
 		{
 			let newElem;
