@@ -367,7 +367,15 @@ class Binding
 	update(what, fireEvent = false, event = 'notify', updateValue = false, newValue = null)
 	{
 		if(Object.keys(this.#observables.bind).includes(what))
-		{}
+		{
+			const observable = this.#observables.bind[what];
+			if (updateValue) observable.value = newValue;
+			if (fireEvent)
+			{
+				// allows forced update of the bound property
+				if (what.indexOf('.') === -1) observable.notify('load', {value: this.resolve(what), prop: what});
+			}
+		}
 		if(Object.keys(this.#observables.model).includes(what))
 		{}
 		if(Object.keys(this.#observables.for).includes(what))

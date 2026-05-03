@@ -103,6 +103,19 @@
 <span><button jf-click="createTodo1" jf-event="static">Add ToDo</button></span>
 <ul style="list-style: none" jf-for="todos1 as todo" jf-template="<li><span jf-bind=''></span><button jf-click='deleteTodo1' jf-props='this.parentElement.querySelector(&quot;span&quot;).innerHTML'>&times;</button></li>"></ul>
 
+
+<br/>
+<br/>
+<h1>Count Math test</h1>
+<p>click the + and - buttons to add or subtract 1 from count</p>
+
+<span>
+	<button jf-click="modifyCount" jf-props="+" jf-event="static">+</button> <button jf-click="modifyCount" jf-props="-" jf-event="static">-</button>
+	<div>
+		<span>COUNT: </span> <span jf-bind="count"></span>
+	</div>
+</span>
+
 <script>
 
 	let app = {
@@ -110,6 +123,11 @@
 			person: {
 				name: 'Jesse',
 				age: 38
+			},
+			personTwo: {
+				firstName: 'Jesse',
+				lastName: 'Smith',
+				get personName () { return `${app.data.personTwo.firstName} ${app.data.personTwo.lastName}`}
 			},
 			tasks : [
 				{
@@ -190,7 +208,8 @@
 						}
 					]
 				}
-			]
+			],
+			count: 0
 		},
 		methods: {
 			click: {
@@ -232,6 +251,11 @@
 				toggleTestIf: function (event) {
 					app.data.showMe = !app.data.showMe;
 					myApp.update('showMe', true, 'change');
+				},
+				modifyCount: (event, dir) => {
+					const sign = event.detail.dir;
+					app.data.count = sign === "+" ? app.data.count + 1 : app.data.count - 1;
+					myApp.update('count', true, 'load')
 				}
 			}
 		},
