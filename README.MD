@@ -123,6 +123,34 @@ let app = {
 	}
 }
 ```
+Another example of binding are things that get updated outside the initial load and model (two-way) binding. See the example of a count increment / decrement:
+```html
+<h1>Count Math test</h1>
+<p>click the + and - buttons to add or subtract 1 from count</p>
+<span>
+	<button jf-click="modifyCount" jf-props="+" jf-event="static" jf-model="count">+</button> <button jf-click="modifyCount" jf-props="-" jf-event="static" jf-model="count">-</button>
+	<div>
+		<span>COUNT: </span> <span jf-bind="count"></span>
+	</div>
+</span>
+```
+```js
+let myApp = new App({
+   data: { count: 0 },
+   methods: {
+	   click: (event,dir) => {
+          modifyCount: (event, dir) => {
+             const sign = event.detail.dir;
+             myApp.data.count = sign === "+" ? myApp.data.count + 1 : myApp.data.count - 1;
+             myApp.update('count', true, 'load')
+          }
+       }
+   }
+})
+```
+Each time you click the '+' or '-' button count is incremented or decremented. This is done in the myApp.methods.click.modifyCount event. However you do have to tell the binding that it needs to update. This update call 
+would normally be done via a jf-model binding, but this doesn't work on buttons or any other thing that is not listening for the update call to change. So you can use the myApp.update() method to force the specific 
+binding to rebind; in this case it is the myApp.data.count property, in which we call the load event and fire the event - and the HTML Element data is updated.
 
 ## Two-way binding / Model binding
 
